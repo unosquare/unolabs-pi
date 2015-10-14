@@ -23,16 +23,20 @@ namespace unopi
 
             Task.Run(() =>
             {
+                ApiController.ButtonCheck.Add(26, 0);
+                var prev = true;
+
                 while (true)
                 {
-                    var x = CoreFunctions.ReadBit(26) ? 0 : 1;
+                    var x = CoreFunctions.ReadBit(26);
 
-                    if (ApiController.ButtonCheck.ContainsKey(26))
-                        ApiController.ButtonCheck[26] += x;
-                    else
-                        ApiController.ButtonCheck.Add(26, x);
+                    if (x != prev)
+                    {
+                        ApiController.ButtonCheck[26] += prev ? 1 : 0;
+                        prev = x;
+                    }
 
-                    Task.Delay(TimeSpan.FromSeconds(1));
+                    System.Threading.Thread.Sleep(5);
                 }
             });
 
