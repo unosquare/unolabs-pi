@@ -1,0 +1,1 @@
+sshdeploy monitor -s "c:\Unosquare\unolabs-pi\bin\Debug" -t "/home/pi/target" -h 172.16.16.166 --pre "pgrep -f 'unopi.exe' | xargs -r kill" --post "cd ~/target && sudo mono unopi.exe"
