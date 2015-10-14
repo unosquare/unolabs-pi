@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Unosquare.Labs.EmbedIO;
 using Unosquare.Labs.EmbedIO.Log;
 using Unosquare.Labs.EmbedIO.Modules;
+using Unosquare.Labs.WiringPi;
+using Constants = Unosquare.Labs.WiringPi.Constants;
 
 namespace unopi
 {
@@ -12,7 +16,29 @@ namespace unopi
     {
         private static void Main(string[] args)
         {
-            var url = "http://localhost:9696/";
+            #region Setup buttons
+
+            Setup.WiringPiSetupGpio();
+            CoreFunctions.SetPinMode(26, Constants.PinMode.Input);
+
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    var x = CoreFunctions.ReadBit(26) ? 0 : 1;
+
+                    if (ApiController.ButtonCheck.ContainsKey(26))
+                        ApiController.ButtonCheck[26] += x;
+                    else
+                        ApiController.ButtonCheck.Add(26, x);
+
+                    Task.Delay(TimeSpan.FromSeconds(1));
+                }
+            });
+
+            #endregion
+
+            var url = "http://*:9696/";
             if (args.Length > 0)
                 url = args[0];
 
@@ -20,17 +46,12 @@ namespace unopi
             // there are alternate constructors that allow you to skip specifying an ILog object.
             using (var server = new WebServer(url, new SimpleConsoleLog()))
             {
-                // First, we will configure our web server by adding Modules.
-                // Please note that order DOES matter.
-                // ================================================================================================
-                // If we want to enable sessions, we simply register the LocalSessionModule
-                // Beware that this is an in-memory session storage mechanism so, avoid storing very large objects.
-                // You can use the server.GetSession() method to get the SessionInfo object and manupulate it.
-                // You could potentially implement a distributed session module using something like Redis
-                server.RegisterModule(new LocalSessionModule());
+                server.WithWebApiController<ApiController>();
+                server.RegisterModule(new CorsModule());
 
                 // Here we setup serving of static files
-                server.RegisterModule(new StaticFilesModule("/home/pi/target"));
+                server.RegisterModule(new StaticFilesModule(Directory.GetCurrentDirectory()));
+
                 // The static files module will cache small files in ram until it detects they have been modified.
                 server.Module<StaticFilesModule>().UseRamCache = true;
                 server.Module<StaticFilesModule>().DefaultExtension = ".html";
@@ -42,15 +63,7 @@ namespace unopi
                 // disposing of the object until a key is pressed.
                 //server.Run();
                 server.RunAsync();
-
-                // Fire up the browser to show the content if we are debugging!
-#if DEBUG
-                var browser = new System.Diagnostics.Process()
-                {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo(url) {UseShellExecute = true}
-                };
-                browser.Start();
-#endif
+                
                 // Wait for any key to be pressed before disposing of our web server.
                 // In a service we'd manage the lifecycle of of our web server using
                 // something like a BackgroundWorker or a ManualResetEvent.

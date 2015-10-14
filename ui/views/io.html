@@ -1,0 +1,48 @@
+﻿<div ng-controller="IOCtrl">
+    <table>
+        <tr><td class="bg-danger">3V3</td><td>5V</td></tr>
+        <tr><td>
+            <button class="btn btn-xs" ng-click="IO(2)">
+                GPIO2
+            </button>
+        </td><td>5V</td></tr>
+        <tr><td>
+            <button class="btn btn-xs" ng-click="IO(3)">
+                GPIO3
+            </button>
+        </td><td>GND</td></tr>
+        <tr><td>
+            <button class="btn btn-xs" ng-click="IO(4)">
+                GPIO4
+            </button>
+        </td><td>
+            <button class="btn btn-xs" ng-click="IO(14)">
+                GPIO14
+            </button>
+        </td></tr>
+        <tr><td>Ground</td><td>
+            <button class="btn btn-xs" ng-click="IO(15)">
+                GPIO15
+            </button>
+        </td></tr>
+        <tr><td><button class="btn btn-xs" ng-click="IO(17)">
+            GPIO17
+        </button></td><td>
+            <button class="btn btn-xs" ng-click="IO(18)">
+                GPIO18
+            </button>
+        </td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td><button class="btn btn-xs btn-danger" ng-click="buttonIO(26)">
+    GPIO26 Button
+</button></td><td><button class="btn btn-xs" ng-click="IO(20)">
+    GPIO20 LED
+</button></td></tr>
+        <tr><td></td><td><button class="btn btn-xs" ng-click="IO(21)">
+    GPIO21 LED
+</button></td></tr>
+    </table>
+</div>

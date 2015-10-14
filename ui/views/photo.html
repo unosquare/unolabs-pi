@@ -1,0 +1,19 @@
+﻿<div ng-controller="PhotoCtrl">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="text-center">
+                <button class="btn btn-lg btn-danger" ng-click="takePhoto()">
+                    <i class="fa fa-camera"></i>&nbsp;Take PHOTO!
+                </button>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-md-3" ng-repeat="item in items">
+            <a class="thumbnail" ng-click="popup(item)">
+                <img src="/ui/{{item}}" style="width: 300px" />
+            </a>
+        </div>
+    </div>
+</div>  

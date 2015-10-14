@@ -16,9 +16,12 @@
                     templateUrl: '/ui/views/home.html',
                     title: 'Home',
                     print: true
-                }).when('/Login', {
-                    templateUrl: '/ui/views/login.html',
-                    title: 'Login'
+                }).when('/Camera', {
+                    templateUrl: '/ui/views/photo.html',
+                    title: 'Camera'
+                }).when('/IO', {
+                    templateUrl: '/ui/views/io.html',
+                    title: 'Pin I/O'
                 }).otherwise({
                     redirectTo: '/'
                 });
@@ -60,9 +63,47 @@
             $scope.senderKey = $routeParams.senderkey || '';
 
             $scope.$on('tbForm_OnConnectionError', function(ev, error) { alerts.defaultErrorHandler(error); });
-            $scope.$on('tbGrid_OnConnectionError', function(ev, error) { alerts.defaultErrorHandler(error); });
+            $scope.$on('tbGrid_OnConnectionError', function (ev, error) { alerts.defaultErrorHandler(error); });
         }
-    ]).controller('TitleCtrl', [
+    ]).controller('IOCtrl', ['$scope', 'tubularHttp', function ($scope, tubularHttp) {
+        $scope.IO = function (n) {
+            tubularHttp.setRequireAuthentication(false);
+            tubularHttp.get('/api/io/' + n).promise.then(function(data) {
+                toastr.success('Check IO ' + n);
+            });
+        };
+
+        $scope.buttonIO = function (n) {
+            tubularHttp.setRequireAuthentication(false);
+            tubularHttp.get('/api/buttonio/' + n).promise.then(function (data) {
+                if (data) toastr.success('Button IO ' + data.count);
+            });
+        };
+    }]).controller('PhotoCtrl', ['$scope', 'tubularHttp', '$timeout', '$modal', function ($scope, tubularHttp, $timeout, $modal) {
+        $scope.loadPhotos = function () {
+            tubularHttp.setRequireAuthentication(false);
+            tubularHttp.get('/api/photos').promise.then(function(data) {
+                $scope.items = data;
+
+                $timeout($scope.loadPhotos, 1000);
+            });
+        };
+
+        $scope.takePhoto = function () {
+            tubularHttp.setRequireAuthentication(false);
+            tubularHttp.get('/api/takephoto').promise.then(function (data) {
+                $scope.items = data;
+            });
+        };
+
+        $scope.popup = function(item) {
+            $modal.open({
+                template: '<div style="min-height: 400px; padding: 10px;"><img src="/ui/' + item + '" style="width: 100%; margin: auto;" /></div>'
+            });
+        };
+
+        $timeout($scope.loadPhotos, 500);
+    }]).controller('TitleCtrl', [
         '$scope', '$route', '$location', 'tubularHttp', '$routeParams',
         function($scope, $route, $location, tubularHttp, $routeParams) {
             var me = this;
@@ -77,10 +118,6 @@
                 me.pageTitle = me.key;
                 if ($routeParams.param) me.pageTitle += " - " + $routeParams.param;
                 me.content = me.pageTitle + " - Sample";
-
-                if ($route.current.title != 'Login' && tubularHttp.isAuthenticated() == false) {
-                    $location.path("/Login");
-                }
             });
         }
     ]).controller('NavCtrl', [
@@ -96,35 +133,9 @@
 
             $scope.menu = [
                 { icon: 'fa-dashboard', title: 'Home', path: '/' },
-                { icon: 'fa-desktop', title: 'Another link', path: '/Something' },
-                { icon: 'fa-puzzle-piece', title: 'One link', path: '/Link' }
+                { icon: 'fa-camera', title: 'Camera', path: '/Camera' },
+                { icon: 'fa-bolt', title: 'Pin I/O', path: '/IO' }
             ];
-        }
-    ]).controller('LoginCtrl', [
-        '$scope', '$location', 'tubularHttp', function ($scope, $location, tubularHttp) {
-            $scope.loading = false;
-
-            $scope.submitForm = function (valid) {
-                if (valid == false) {
-                    toastr.error("Please complete form");
-                }   
-
-                $scope.loading = true;
-
-                tubularHttp.authenticate($scope.username, $scope.password, $scope.redirectHome, function (error) {
-                    $scope.loading = false;
-                    toastr.error(error);
-                }, true);
-            };
-
-            $scope.redirectHome = function () {
-                $location.path("/");
-                $("#wrapper").removeClass('toggled');
-                $("#menu-toggle").show();
-            };
-
-            $("#wrapper").addClass('toggled');
-            $("#menu-toggle").hide();
         }
     ]);
 })();
