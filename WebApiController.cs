@@ -43,7 +43,7 @@ namespace unopi
                 }
 
                 var dir = new DirectoryInfo(photodir);
-                var files = dir.GetFiles("*.jpg").Select(x => x.Name).Take(6);
+                var files = dir.GetFiles("*.jpg").Select(x => x.Name).Take(10);
 
                 return context.JsonResponse(files);
             }
@@ -59,7 +59,7 @@ namespace unopi
             try
             {
                 var dir = new DirectoryInfo(photodir);
-                var files = dir.GetFiles("*.jpg").Select(x => x.Name).Take(6);
+                var files = dir.GetFiles("*.jpg").Select(x => x.Name).Take(10);
 
                 return context.JsonResponse(files);
             }
