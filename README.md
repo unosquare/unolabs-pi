@@ -1,3 +1,5 @@
+[![Analytics](https://ga-beacon.appspot.com/UA-8535255-2/unosquare/unolabs-pi/)](https://github.com/igrigorik/ga-beacon)
+
 # unolabs-pi
 
 ![Unosquare](http://unosquare.github.io/assets/logo.png)
